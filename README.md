@@ -209,6 +209,7 @@ git push -u origin main
    * **Framework preset:** `Vite`
    * **Build command:** `npm run build`
    * **Build output directory:** `dist`
+   * **Deploy command:** *(Leave empty / default for Pages. If your CI or dashboard requires one, use `npx wrangler pages deploy dist` — DO NOT use `npx wrangler deploy`).*
 4. Click **Save and Deploy**.
 
 ### Step 3: Bind the Private R2 Bucket to Cloudflare Pages

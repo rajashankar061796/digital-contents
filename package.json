@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "deploy": "wrangler pages deploy dist",
+    "pages:deploy": "wrangler pages deploy dist",
     "pages:dev": "wrangler pages dev ./dist"
   },
   "dependencies": {
@@ -25,6 +27,6 @@
     "sass": "^1.79.1",
     "typescript": "^5.5.3",
     "vite": "^5.4.6",
-    "wrangler": "^3.78.6"
+    "wrangler": "^3.114.0"
   }
 }
