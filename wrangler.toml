@@ -1,7 +1,12 @@
 name = "digital-contents"
-pages_build_output_dir = "dist"
+main = "src/worker.ts"
 compatibility_date = "2024-09-01"
 compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Static Assets (Vite React frontend)
+[assets]
+directory = "./dist"
+binding = "ASSETS"
 
 # Cloudflare R2 bucket binding for secure, private PDF storage
 [[r2_buckets]]
@@ -23,8 +28,7 @@ SITE_URL = "https://digital-contents.pages.dev"
 
 # ==============================================================================
 # SECRETS (Do NOT commit real secret values here!)
-# Add these via the Cloudflare Dashboard (Pages > Settings > Environment variables)
-# or via Wrangler for local development in `.dev.vars`:
+# Add these via the Cloudflare Dashboard (Settings > Variables and Secrets)
 # 1. CASHFREE_APP_ID
 # 2. CASHFREE_SECRET_KEY
 # 3. CASHFREE_WEBHOOK_SECRET (optional / defaults to CASHFREE_SECRET_KEY)
