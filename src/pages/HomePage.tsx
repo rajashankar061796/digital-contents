@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { load } from '@cashfreepayments/cashfree-js';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { ProductCover } from '@/components/ProductCover';
 import { PRODUCT_CONFIG } from '@/config/payment';
 
@@ -206,12 +207,7 @@ export const HomePage: React.FC = () => {
         </div>
       </main>
 
-      <footer className="site-footer">
-        <div className="container footer-inner">
-          <p>© {new Date().getFullYear()} Digital Contents. All rights reserved.</p>
-          <p>Secure digital fulfillment powered by Cloudflare R2 &amp; Cashfree.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

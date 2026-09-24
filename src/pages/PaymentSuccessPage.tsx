@@ -11,6 +11,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { PRODUCT_CONFIG } from '@/config/payment';
 
 type VerificationState = 'verifying' | 'success' | 'pending' | 'failed' | 'invalid';
@@ -293,6 +294,8 @@ export const PaymentSuccessPage: React.FC = () => {
 
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 };
