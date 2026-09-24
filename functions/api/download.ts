@@ -39,65 +39,68 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 
   // ===========================================================================
-  // 2. Fetch PDF from Private Cloudflare R2 Bucket Binding
+  // 2. Retrieve PDF from Protected Static Assets or R2 Binding
   // ===========================================================================
   const objectKey = env.PDF_OBJECT_KEY || 'artificial-intelligence-beginners.pdf';
 
-  if (!env.PDF_BUCKET) {
+  try {
+    // If R2 Bucket binding is configured, use it
+    if (env.PDF_BUCKET) {
+      const pdfObject = await env.PDF_BUCKET.get(objectKey);
+      if (pdfObject) {
+        const headers = new Headers();
+        pdfObject.writeHttpMetadata(headers);
+        headers.set('Content-Type', 'application/pdf');
+        headers.set(
+          'Content-Disposition',
+          'attachment; filename="Artificial-Intelligence-An-brief-overview-for-beginners.pdf"'
+        );
+        headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate, max-age=0');
+        if (pdfObject.size) headers.set('Content-Length', pdfObject.size.toString());
+
+        return new Response(pdfObject.body, { status: 200, headers });
+      }
+    }
+
+    // Otherwise, retrieve from protected static assets
+    if (env.ASSETS) {
+      const assetUrl = new URL(`/private-assets/${objectKey}`, request.url);
+      const assetResponse = await env.ASSETS.fetch(new Request(assetUrl.toString()));
+
+      if (assetResponse.ok) {
+        const headers = new Headers(assetResponse.headers);
+        headers.set('Content-Type', 'application/pdf');
+        headers.set(
+          'Content-Disposition',
+          'attachment; filename="Artificial-Intelligence-An-brief-overview-for-beginners.pdf"'
+        );
+        headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate, max-age=0');
+        headers.set('Pragma', 'no-cache');
+        headers.set('Expires', '0');
+
+        return new Response(assetResponse.body, {
+          status: 200,
+          headers,
+        });
+      }
+    }
+
     return new Response(
       JSON.stringify({
-        error: 'Configuration Error',
-        message: 'R2 bucket binding (PDF_BUCKET) is not configured in Cloudflare Pages.',
+        error: 'File Not Found',
+        message: `The PDF file ("${objectKey}") could not be located in assets.`,
       }),
       {
-        status: 500,
+        status: 404,
         headers: { 'Content-Type': 'application/json' },
       }
     );
-  }
-
-  try {
-    const pdfObject = await env.PDF_BUCKET.get(objectKey);
-
-    if (!pdfObject) {
-      return new Response(
-        JSON.stringify({
-          error: 'File Not Found',
-          message: `The PDF file ("${objectKey}") has not been uploaded to the Cloudflare R2 bucket yet. Please upload your PDF to the R2 bucket with object name: "${objectKey}".`,
-        }),
-        {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-    }
-
-    // Prepare response headers for clean, secure PDF attachment delivery
-    const headers = new Headers();
-    pdfObject.writeHttpMetadata(headers);
-    headers.set('Content-Type', 'application/pdf');
-    headers.set(
-      'Content-Disposition',
-      'attachment; filename="Artificial-Intelligence-An-brief-overview-for-beginners.pdf"'
-    );
-    headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate, max-age=0');
-    headers.set('Pragma', 'no-cache');
-    headers.set('Expires', '0');
-
-    if (pdfObject.size) {
-      headers.set('Content-Length', pdfObject.size.toString());
-    }
-
-    return new Response(pdfObject.body, {
-      status: 200,
-      headers,
-    });
   } catch (error: unknown) {
-    console.error('R2 retrieval error:', error);
+    console.error('Download retrieval error:', error);
     return new Response(
       JSON.stringify({
         error: 'Storage Error',
-        message: 'Failed to retrieve the PDF from private storage. Please try again or contact support.',
+        message: 'Failed to retrieve the PDF. Please try again or contact support.',
       }),
       {
         status: 500,

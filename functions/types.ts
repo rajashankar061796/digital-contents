@@ -3,11 +3,14 @@
  */
 
 export interface Env {
-  // Cloudflare R2 Bucket Binding (private storage for the PDF)
-  PDF_BUCKET: R2Bucket;
+  // Optional R2 Bucket Binding (if R2 is used; otherwise static protected assets are used)
+  PDF_BUCKET?: R2Bucket;
 
-  // Filename / Object key inside the R2 Bucket
+  // Filename / Object key for the PDF
   PDF_OBJECT_KEY?: string;
+
+  // Static Assets fetcher
+  ASSETS?: Fetcher;
 
   // Cashfree API Credentials
   CASHFREE_APP_ID?: string;
