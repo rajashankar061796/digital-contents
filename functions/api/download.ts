@@ -62,10 +62,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       }
     }
 
-    // Otherwise, retrieve from protected static assets
+    // Retrieve from protected static assets
     if (env.ASSETS) {
       const assetUrl = new URL(`/private-assets/${objectKey}`, request.url);
-      const assetResponse = await env.ASSETS.fetch(new Request(assetUrl.toString()));
+      const assetResponse = await env.ASSETS.fetch(
+        new Request(assetUrl.toString(), {
+          headers: {
+            'x-internal-download': 'true',
+          },
+        })
+      );
 
       if (assetResponse.ok) {
         const headers = new Headers(assetResponse.headers);

@@ -35,7 +35,6 @@ export const PaymentSuccessPage: React.FC = () => {
   const [status, setStatus] = useState<VerificationState>('verifying');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [downloadToken, setDownloadToken] = useState<string>('');
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const autoDownloadTriggered = useRef<boolean>(false);
 
   const performVerification = useCallback(async () => {
@@ -101,7 +100,6 @@ export const PaymentSuccessPage: React.FC = () => {
   // Handle PDF Download
   const triggerDownload = useCallback((token: string) => {
     if (!token) return;
-    setIsDownloading(true);
 
     const downloadUrl = `/api/download?token=${encodeURIComponent(token)}`;
     
@@ -109,13 +107,10 @@ export const PaymentSuccessPage: React.FC = () => {
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.setAttribute('download', 'Artificial-Intelligence-An-brief-overview-for-beginners.pdf');
+    link.setAttribute('target', '_blank');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    setTimeout(() => {
-      setIsDownloading(false);
-    }, 2000);
   }, []);
 
   // Automatic download attempt on verification success
@@ -188,27 +183,19 @@ export const PaymentSuccessPage: React.FC = () => {
               </div>
 
               <div className="action-buttons-group">
-                <button
-                  type="button"
+                <a
+                  href={`/api/download?token=${encodeURIComponent(downloadToken)}`}
                   id="download-pdf-btn"
-                  onClick={() => triggerDownload(downloadToken)}
-                  disabled={isDownloading}
-                  className={`download-button ${isDownloading ? 'downloading' : ''}`}
+                  download="Artificial-Intelligence-An-brief-overview-for-beginners.pdf"
+                  className="download-button"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  {isDownloading ? (
-                    <>
-                      <Loader2 size={20} className="spinner" />
-                      <span>Downloading PDF...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Download size={20} />
-                      <span>Download PDF</span>
-                    </>
-                  )}
-                </button>
+                  <Download size={20} />
+                  <span>Download PDF</span>
+                </a>
                 <p className="download-auto-notice">
-                  If your automatic download did not start, click the button above.
+                  If your automatic download did not start, tap the button above to download.
                 </p>
               </div>
             </div>

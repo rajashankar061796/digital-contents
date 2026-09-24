@@ -43,9 +43,9 @@ export default {
 
     // -------------------------------------------------------------------------
     // SECURITY: Block direct public access to private assets
-    // (Only authorized requests passing through /api/download can access the PDF)
+    // (Only authorized internal requests or /api/download can access the PDF)
     // -------------------------------------------------------------------------
-    if (path.startsWith('/private-assets/')) {
+    if (path.startsWith('/private-assets/') && request.headers.get('x-internal-download') !== 'true') {
       return new Response(
         JSON.stringify({
           error: 'Forbidden',

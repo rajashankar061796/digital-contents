@@ -1,6 +1,6 @@
 import { DownloadTokenPayload } from '../types';
 
-// Convert Uint8Array to base64url string
+// Convert ArrayBuffer to Base64URL string
 function bufferToBase64Url(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
   let binary = '';
@@ -13,21 +13,18 @@ function bufferToBase64Url(buffer: ArrayBuffer): string {
     .replace(/=+$/, '');
 }
 
-// Convert string to Base64URL string
-function stringToBase64Url(str: string): string {
-  return btoa(unescape(encodeURIComponent(str)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
-
-// Convert Base64URL string to standard string
-function base64UrlToString(base64Url: string): string {
+// Convert Base64URL string to Uint8Array bytes
+function base64UrlToBytes(base64Url: string): Uint8Array {
   let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
   while (base64.length % 4) {
     base64 += '=';
   }
-  return decodeURIComponent(escape(atob(base64)));
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
 }
 
 /**
@@ -54,7 +51,7 @@ export async function signDownloadToken(
   };
 
   const payloadJson = JSON.stringify(payload);
-  const payloadEncoded = stringToBase64Url(payloadJson);
+  const payloadEncoded = bufferToBase64Url(encoder.encode(payloadJson).buffer);
 
   // Import HMAC key
   const key = await crypto.subtle.importKey(
@@ -106,31 +103,30 @@ export async function verifyDownloadToken(
       ['verify']
     );
 
-    // Convert signature back to bytes
-    const expectedSigRaw = base64UrlToString(signatureEncoded);
-    const expectedSigBytes = new Uint8Array(expectedSigRaw.length);
-    for (let i = 0; i < expectedSigRaw.length; i++) {
-      expectedSigBytes[i] = expectedSigRaw.charCodeAt(i);
-    }
+    // Convert signature back to bytes directly (no corrupting string transforms)
+    const expectedSigBytes = base64UrlToBytes(signatureEncoded);
 
     // Verify signature
     const isValid = await crypto.subtle.verify(
       'HMAC',
       key,
-      expectedSigBytes,
+      expectedSigBytes as BufferSource,
       encoder.encode(payloadEncoded)
     );
 
     if (!isValid) {
+      console.warn('HMAC token signature mismatch');
       return null;
     }
 
-    // Decode and parse payload
-    const payloadJson = base64UrlToString(payloadEncoded);
+    // Decode payload
+    const payloadBytes = base64UrlToBytes(payloadEncoded);
+    const payloadJson = new TextDecoder().decode(payloadBytes);
     const payload: DownloadTokenPayload = JSON.parse(payloadJson);
 
     // Verify expiration
     if (!payload.exp || Date.now() > payload.exp) {
+      console.warn('HMAC token expired');
       return null;
     }
 
