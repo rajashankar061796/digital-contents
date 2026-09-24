@@ -18,14 +18,15 @@ CASHFREE_ENVIRONMENT = "production"
 # Cashfree API Version
 CASHFREE_API_VERSION = "2023-08-01"
 
-# Public Site Base URL for Cashfree Return URL & Webhook Notifications
-SITE_URL = "https://digital-contents.pages.dev"
+# Public Site Base URL
+SITE_URL = "https://digital-contents.rajashankar061796.workers.dev"
+
+# Cashfree Merchant App ID (Client ID)
+CASHFREE_APP_ID = "1440612c9fd7f924a95820c280e2160441"
 
 # ==============================================================================
-# SECRETS (Do NOT commit real secret values here!)
-# Add these via the Cloudflare Dashboard (Settings > Variables and Secrets)
-# 1. CASHFREE_APP_ID
-# 2. CASHFREE_SECRET_KEY
-# 3. CASHFREE_WEBHOOK_SECRET (optional / defaults to CASHFREE_SECRET_KEY)
-# 4. DOWNLOAD_SIGNING_SECRET (optional secret key for HMAC token signing; defaults to CASHFREE_SECRET_KEY)
+# SECRETS (Kept encrypted in Cloudflare Dashboard)
+# 1. CASHFREE_SECRET_KEY
+# 2. CASHFREE_WEBHOOK_SECRET (optional)
+# 3. DOWNLOAD_SIGNING_SECRET (optional)
 # ==============================================================================
