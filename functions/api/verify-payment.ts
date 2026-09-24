@@ -106,11 +106,14 @@ async function handleVerification(context: EventContext<Env, any, any>): Promise
     // =========================================================================
     // 3. Strict Server-Side Validation:
     //    - order_status === "PAID"
-    //    - order_amount === 1 (or 25)
+    //    - order_amount === 23 (or previous test amounts 1 / 25)
     //    - order_currency === "INR"
     // =========================================================================
     const isStatusPaid = orderData.order_status === 'PAID';
-    const isAmountValid = Math.abs(Number(orderData.order_amount) - 1) < 0.01 || Math.abs(Number(orderData.order_amount) - 25) < 0.01;
+    const isAmountValid = 
+      Math.abs(Number(orderData.order_amount) - 23) < 0.01 || 
+      Math.abs(Number(orderData.order_amount) - 1) < 0.01 || 
+      Math.abs(Number(orderData.order_amount) - 25) < 0.01;
     const isCurrencyValid = orderData.order_currency?.toUpperCase() === 'INR';
 
     if (isStatusPaid && isAmountValid && isCurrencyValid) {

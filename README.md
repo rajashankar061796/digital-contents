@@ -38,26 +38,26 @@ The codebase is fully implemented with automated Hosted Checkout order creation.
 ```
 1. Customer visits Landing Page
       │
-      ▼ (Customer clicks "Buy & Download – ₹25")
+      ▼ (Customer clicks "Buy & Download – ₹23")
 2. React calls POST /api/create-order
       │
       ▼ (Cloudflare Worker calls Cashfree API server-side)
 3. Cashfree Create Order API
-      │  - Amount: 25 INR
+      │  - Amount: 23 INR
       │  - Generates unique order_id
       │  - Sets return_url to ${SITE_URL}/payment-success?order_id={order_id}
       │  - Returns payment_session_id
       ▼
 4. Cashfree JS SDK launches Hosted Checkout
       │  - Customer enters their payment and contact details on Cashfree
-      │  - Customer completes ₹25 payment
+      │  - Customer completes ₹23 payment
       ▼
 5. Cashfree redirects to: /payment-success?order_id=...
       │
       ▼ (React calls POST /api/verify-payment with order_id)
 6. Cloudflare Worker (Backend Verification)
       │  - Calls Cashfree Get Order API (GET /pg/orders/{order_id})
-      │  - Verifies: status === "PAID", amount === 25, currency === "INR"
+      │  - Verifies: status === "PAID", amount === 23, currency === "INR"
       │  - Issues signed HMAC-SHA256 download token (15-min validity)
       ▼
 7. Secure PDF Download (GET /api/download?token=...)
@@ -98,7 +98,7 @@ digital-contents/
 │   ├── config/
 │   │   └── payment.ts           # Product details & 6 roadmap topics
 │   ├── pages/
-│   │   ├── HomePage.tsx         # Product hero, 6 topics, ₹25 price, Hosted Checkout CTA
+│   │   ├── HomePage.tsx         # Product hero, 6 topics, ₹23 price, Hosted Checkout CTA
 │   │   ├── PaymentSuccessPage.tsx # Automated verification, auto-download & manual fallback
 │   │   └── NotFoundPage.tsx     # 404 handler
 │   ├── styles/

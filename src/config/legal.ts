@@ -12,7 +12,7 @@ export const LEGAL_CONFIG = {
   brandName: 'Digital Contents',
   supportEmail: 'rajashankar061796@gmail.com',
   productName: 'Artificial Intelligence - An brief overview for beginners',
-  productPrice: '₹1',
+  productPrice: '₹23',
   currency: 'INR',
   deliveryMode: 'Instant Digital PDF Download',
   lastUpdated: 'September 2026',
