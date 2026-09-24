@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -26,6 +27,7 @@ interface CreateOrderResponse {
 }
 
 export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -45,9 +47,11 @@ export const HomePage: React.FC = () => {
 
       const data: CreateOrderResponse = await response.json();
 
-      if (!response.ok || !data.success || !data.payment_session_id) {
+      if (!response.ok || !data.success || !data.payment_session_id || !data.order_id) {
         throw new Error(data.message || 'Failed to initiate payment session with Cashfree.');
       }
+
+      const orderId = data.order_id;
 
       // 2. Initialize official Cashfree JS SDK
       const cashfree = await load({
@@ -55,10 +59,18 @@ export const HomePage: React.FC = () => {
       });
 
       // 3. Open Cashfree Hosted Checkout (Modal popup)
-      await cashfree.checkout({
+      const result = (await cashfree.checkout({
         paymentSessionId: data.payment_session_id,
         redirectTarget: '_modal',
-      });
+      })) as { error?: { message?: string; code?: string } } | undefined;
+
+      // 4. When customer completes payment in modal, redirect to success verification page
+      if (result?.error) {
+        console.warn('Cashfree modal status:', result.error);
+      }
+
+      // Automatically navigate to payment verification & download page
+      navigate(`/payment-success?order_id=${encodeURIComponent(orderId)}`);
     } catch (err: unknown) {
       console.error('Checkout error:', err);
       const message = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
@@ -140,7 +152,7 @@ export const HomePage: React.FC = () => {
                   {isProcessing ? (
                     <>
                       <Loader2 size={20} className="spinner" />
-                      <span>Preparing Secure Checkout...</span>
+                      <span>Verifying &amp; Redirecting...</span>
                     </>
                   ) : (
                     <>

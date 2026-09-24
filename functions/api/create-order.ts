@@ -53,7 +53,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const orderPayload = {
     order_id: orderId,
-    order_amount: 25.00,
+    order_amount: 1.00,
     order_currency: 'INR',
     customer_details: {
       customer_id: customerId,
