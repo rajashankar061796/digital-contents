@@ -53,10 +53,10 @@ export const HomePage: React.FC = () => {
         mode: data.environment === 'sandbox' ? 'sandbox' : 'production',
       });
 
-      // 3. Open Cashfree Hosted Checkout
+      // 3. Open Cashfree Hosted Checkout (Modal popup)
       await cashfree.checkout({
         paymentSessionId: data.payment_session_id,
-        redirectTarget: '_self',
+        redirectTarget: '_modal',
       });
     } catch (err: unknown) {
       console.error('Checkout error:', err);
