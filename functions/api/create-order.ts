@@ -3,11 +3,10 @@ import { Env, CashfreeCreateOrderResponse } from '../types';
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  // Determine site base URL for return_url and webhook notify_url
+  // Determine site base URL dynamically from current request origin
+  // so that return_url always matches the approved whitelisted domain
   const requestUrl = new URL(request.url);
-  const siteUrl = (env.SITE_URL && env.SITE_URL.trim().length > 0)
-    ? env.SITE_URL.replace(/\/+$/, '')
-    : requestUrl.origin;
+  const siteUrl = requestUrl.origin;
 
   // Generate unique order ID and customer ID
   const randomSuffix = Math.random().toString(36).substring(2, 9);
